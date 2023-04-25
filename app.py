@@ -6,8 +6,12 @@ import langchain
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from langchain.prompts import PromptTemplate
-from langchain.llms import OpenAI
-from langchain.chains import ChatVectorDBChain
+
+""" from langchain.llms import OpenAI """
+from langchain.chat_models import ChatOpenAI
+
+""" from langchain.chains import ChatVectorDBChain """
+from langchain.chains import ConversationalRetrievalChain
 from langchain.cache import InMemoryCache
 from dotenv import load_dotenv
 
@@ -17,8 +21,10 @@ load_dotenv()
 
 
 if not Path("embedded_docs.pkl").exists():
-    raise ValueError("embedded_docs.pkl existiert nicht, "
-                     "bitte führen Sie zunächst 'python import.py' aus")
+    raise ValueError(
+        "embedded_docs.pkl existiert nicht, "
+        "bitte führen Sie zunächst 'python import.py' aus"
+    )
 with open("embedded_docs.pkl", "rb") as f:
     vectorstore = pickle.load(f)
 
@@ -38,7 +44,7 @@ SLACK_APP_TOKEN = os.getenv("SLACK_APP_TOKEN", default="")
 assert SLACK_APP_TOKEN, "SLACK_APP_TOKEN environment variable is missing from .env"
 
 
-llm = OpenAI(
+llm = ChatOpenAI(
     temperature=0.1,
     model_name=OPENAI_API_MODEL,
 )
@@ -69,9 +75,9 @@ qa_prompt = PromptTemplate(
 )
 
 # Die eigentliche QA-Chain
-qa_chain = ChatVectorDBChain.from_llm(
+qa_chain = ConversationalRetrievalChain.from_llm(
     llm,
-    vectorstore,
+    vectorstore.as_retriever(),
     qa_prompt=qa_prompt,
     condense_question_prompt=condense_prompt,
 )
@@ -81,15 +87,15 @@ app = App(
     token=SLACK_BOT_TOKEN,
 )
 
+
 @app.message(SLACK_BOT_KEYWORD)
 def message_hello(message, say):
     """Frage an openai, Ergebnis an user"""
-    question = message['text'].replace(SLACK_BOT_KEYWORD,'')
-    answer = qa_chain({"question":question, "chat_history": history})['answer']
-    say(
-        text=f"<@{message['user']}>: {answer}"
-    )
+    question = message["text"].replace(SLACK_BOT_KEYWORD, "")
+    answer = qa_chain({"question": question, "chat_history": history})["answer"]
+    say(text=f"<@{message['user']}>: {answer}")
     history.append((question, answer))
+
 
 if __name__ == "__main__":
     SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
