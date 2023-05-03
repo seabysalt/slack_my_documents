@@ -7,26 +7,33 @@ Ein simpler Slackbot, der es erlaubt, mit den Daten der eigenen Dokumente zu spr
 ### Slack-Konfiguration
 
 Zunächst braucht unser kleiner Bot einen Zugriff auf Slack. Dazu nutzen wir das Bolt-Framework in Python, das von Slack selbst zur Verfügung gestellt wird,
-Bitte folgen Sie der Anleitung unter https://slack.dev/bolt-python/tutorial/getting-started, um einen SLACK_BOT_TOKEN und einen SLACK_APP_TOKEN zu erhalten. Der SLACK_BOT_TOKEN sollte mit xoxb-... beginnen (Im Reiter OAuth zu finden), der SLACK_APP_TOKEN mit xapp-... . (App-Level Token, nicht Secret oder Verification Token, zu finden über Settings/Basic Information)
+Bitte folge der Anleitung unter https://slack.dev/bolt-python/tutorial/getting-started, um einen SLACK_BOT_TOKEN und einen SLACK_APP_TOKEN zu erhalten. Der SLACK_BOT_TOKEN sollte mit xoxb-... beginnen (Im Reiter OAuth zu finden), der SLACK_APP_TOKEN mit xapp-... . (App-Level Token, nicht Secret oder Verification Token, zu finden über Settings/Basic Information)
 
 Die Slack-App benötigt folgende Einstellungen:
 
-- Socket Mode enabled
-- Event Subscriptions enabled
-  - Subscribe to Bot Events:
-  - Je nach Art der Interaktion
-  - `message:channels`
-  - `message:groups`
-  - `message:im`
-  - `message:mpim`
-- OAuth & Permissions
-- Token (wird bei Integration in Workspace automatisch erstellt)
-- Bot Token Scopes
+1. Socket Mode enabled
+2. Event Subscriptions enabled
+
+- Subscribe to Bot Events:
+- `message:channels`
+- `message:groups`
+- `message:im`
+- `message:mpim`
+- Je nach Art der Interaktion
+- `message:channels`
+- `message:groups`
+- `message:im`
+- `message:mpim`
+
+3. OAuth & Permissions
+4. Token (wird bei Integration in Workspace automatisch erstellt)
+5. Bot Token Scopes
+
 - `chat:write`
 
 ### OpenAI-Key
 
-Bitte legen Sie sich einen OpenAI-Account an und holen Sie sich unter https://platform.openai.com/account/api-keys einen API-Key.
+Bitte lege dir einen OpenAI-Account an und hole dir unter https://platform.openai.com/account/api-keys einen API-Key.
 
 ### Installation
 
@@ -38,20 +45,20 @@ cd slack_my_documents
 
 conda create -n slackbot python=3.10.9
 conda activate slackbot
-conda install pytorch -c pytorc
+conda install pytorch -c pytorch
 
 pip install -r requirements.txt
 ```
 
 ### Konfiguration
 
-Bitte kopieren Sie die Datei .env.example, um eine eigene Konfiguration anzulegen:
+Kopiere die Datei .env.example, um eine eigene Konfiguration anzulegen:
 
 ```
 cp .env.example .env
 ```
 
-Tragen Sie jetzt bitte die 3 Werte von oben in die .env ein, und ergänzen Sie das Keyword, auf das der Bot hören soll.
+Tragen jetzt die 3 Werte von oben in die .env ein, und ergänze das Keyword (SLACK_BOT_KEYWORD), auf das der Bot hören soll.
 
 ````
 # cp .env.example .env
@@ -80,28 +87,20 @@ Der Bot unterstützt im Moment folgende Formate über unstructured.io:
 - Text (.txt)
 - Text in Grafiken (.png, .jpg)
 
-Bitte kopieren Sie alle benötigten Dateien einfach in den Folder ./data.
+Bitte kopiere alle benötigten Dateien einfach in den Folder ./data.
 
-Starten Sie danach den Importer:
+Starte danach den Importer:
 
 ```
 python import.py
 ```
 
-Bitte nutzen Sie dieses Script auch, wenn Sie Ihre Daten aktualisieren wollen - und starten Sie danach den Bot neu, damit er mit den aktuellen Daten arbeitet.
+Bitte nutze dieses Script auch, wenn du deine Daten aktualisieren willst - und startet danach den Bot neu, damit er mit den aktuellen Daten arbeitet.
 
 ## Start
 
-Jetzt können Sie den Bot starten:
+Jetzt könnt ihr den Bot starten:
 
 ```
 python app.py
 ```
-
-# Hinweise
-
-## Datenschutz
-
-In dieser Version nutzt der Bot nicht nur Slack, sondern auch OpenAI. Und auch wenn die Dokumente lokale persistiert werden, und nur bei Bedarf ausgewählte Inhalte weitergegeben werden, so läuft transferiert man trotzdem zwangsläufig eigene Daten an Unternehmen wie Slack, OpenAI oder Microsoft. Prüfen Sie daher bitte im Vorfeld ihre Compliance-Rahmenbedingungen.
-
-## Beispieldokument
